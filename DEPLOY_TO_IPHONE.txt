@@ -1,0 +1,12 @@
+Khaled EGX Analyzer — نشر نسخة الموبايل
+
+1) ارفع محتويات هذا المجلد إلى أي Static Hosting يدعم HTTPS.
+2) افتح الرابط النهائي في Safari على iPhone.
+3) اضغط Share.
+4) اختر Add to Home Screen.
+5) سيظهر Khaled EGX Analyzer كأيقونة على الشاشة.
+
+مهم:
+- لا تفتح index.html مباشرة من Files إذا أردت الاتصال بالـAPI.
+- يجب أن يكون الرابط HTTPS.
+- نسخة الـAPI التجريبية قد تكون محدودة. للاستخدام الحقيقي اليومي، يفضّل ربط Backend بمصدر بيانات EGX موثوق/مرخّص.

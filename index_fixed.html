@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07101d">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Khaled EGX Analyzer</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07101d;color:#f5f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+.app{max-width:560px;margin:auto;min-height:100vh;padding:env(safe-area-inset-top) 14px 28px}
+header{padding:20px 3px 12px}.brand{font-size:24px;font-weight:850}.sub{color:#91a4bd;font-size:12px;margin-top:4px}
+.search{display:flex;gap:8px;margin:8px 0 12px}.search input{min-width:0;flex:1;background:#111d2d;border:1px solid #293b53;border-radius:14px;color:#fff;padding:14px;font-size:17px;text-transform:uppercase}.btn{border:0;border-radius:14px;background:#2d8cff;color:#fff;padding:0 17px;font-weight:800}
+.tabs{display:flex;gap:8px;margin:7px 0 12px}.tab{flex:1;border:1px solid #293b53;background:#0e1927;color:#b7c7da;padding:11px;border-radius:12px}.active{background:#18385d;color:#fff;border-color:#2d8cff}
+.card{background:#101c2b;border:1px solid #22334a;border-radius:18px;padding:15px;margin:10px 0}.top{display:flex;justify-content:space-between;align-items:center}.ticker{font-size:21px;font-weight:850}.price{font-size:26px;font-weight:850;margin-top:4px}.muted{color:#91a4bd;font-size:12px}.pill{padding:7px 10px;border-radius:10px;background:#19392c;color:#58e39b;font-size:12px;font-weight:750}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.metric{background:#0b1522;border-radius:13px;padding:11px}.metric b{display:block;font-size:18px;margin-top:4px}.green{color:#58df9a}.red{color:#ff6f7b}.yellow{color:#ffd56a}.section{font-size:13px;color:#a7b8cc;font-weight:750;margin-bottom:9px}.notice{background:#13243a;border-radius:13px;padding:11px;color:#bcd0e6;font-size:12px;line-height:1.6}.listrow{display:grid;grid-template-columns:55px 1fr 75px 70px;gap:6px;align-items:center;padding:12px 0;border-bottom:1px solid #1e2c40;font-size:12px}.listrow b{font-size:14px}.loader{text-align:center;padding:25px;color:#9db0c6}.footer{text-align:center;color:#627893;font-size:10px;padding:16px}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">📈 Khaled EGX Analyzer</div><div class="sub">نظام تحليل وفرز أسهم البورصة المصرية</div></header>
+<div class="search"><input id="symbol" value="NIPH" placeholder="كود السهم: NIPH"><button class="btn" onclick="analyze()">تحليل</button></div>
+<div class="tabs"><button id="tabA" class="tab active" onclick="tab('analysis')">تحليل السهم</button><button id="tabS" class="tab" onclick="tab('scan')">🔎 Scan EGX</button></div>
+
+<section id="analysis">
+<div class="card">
+<div class="top"><div><div class="ticker" id="ticker">NIPH</div><div class="muted" id="name">جاري تحميل البيانات...</div></div><div class="pill" id="trend">—</div></div>
+<div class="muted" style="margin-top:14px">السعر</div><div class="price" id="price">—</div><div class="muted" id="updated" style="margin-top:4px">—</div>
+</div>
+
+<div class="card"><div class="section">🎯 خطة التداول</div><div class="grid">
+<div class="metric"><span class="muted">🟢 منطقة الدخول</span><b class="green" id="entry">—</b></div>
+<div class="metric"><span class="muted">🛑 Stop</span><b class="red" id="stop">—</b></div>
+<div class="metric"><span class="muted">🎯 Target 1</span><b id="t1">—</b></div>
+<div class="metric"><span class="muted">🎯 Target 2</span><b id="t2">—</b></div>
+</div><div class="metric" style="margin-top:9px"><span class="muted">🎯 Target 3</span><b id="t3">—</b></div></div>
+
+<div class="card"><div class="top"><div class="section">⭐ قوة الإشارة</div><b id="score">—</b></div><div style="height:9px;background:#1c2a3c;border-radius:9px"><div id="scorebar" style="height:100%;width:0;background:#2d8cff;border-radius:9px"></div></div><p class="muted" id="decision">—</p></div>
+
+<div class="card"><div class="section">📊 بيانات السوق</div><div class="grid">
+<div class="metric">التغير<b id="chg">—</b></div><div class="metric">الحجم<b id="vol">—</b></div>
+<div class="metric">قيمة التداول<b id="value">—</b></div><div class="metric">الصناعة<b id="sector">—</b></div>
+</div></div>
+<div class="notice">ℹ️ تم إصلاح مصدر السعر. التطبيق يحاول أولًا خدمة borsa الحقيقية، ثم يستخدم المصدر التجريبي كاحتياطي. مستويات الدخول والأهداف نموذج تحليلي وليست توصية استثمارية.</div>
+</section>
+
+<section id="scan" style="display:none">
+<div class="card"><div class="section">🔎 فحص السوق</div><button class="btn" style="height:44px;width:100%" onclick="scanEGX()">فحص كل الأسهم الآن</button><div id="scanResult" class="loader">اضغط الزر لبدء الفحص.</div></div>
+</section>
+<div class="footer">Khaled EGX Analyzer • أداة تحليلية وليست توصية استثمارية</div>
+</div>
+
+<script>
+const API="https://borsa.ashh.me";
+const DEMO_API="https://demo.borsa.ashh.me";
+
+function n(x){return Number(x||0)}
+function fmt(x){return Number.isFinite(n(x))?n(x).toLocaleString("en-US",{maximumFractionDigits:2}):"—"}
+
+function plan(q){
+ let p=n(q.last_price ?? q.price ?? q.close ?? q.last);
+ let ch=n(q.change_percent ?? q.pct_change ?? q.change_pct);
+ let atr=Math.max(p*.025,Math.abs(p*ch/100)*1.8);
+ let entryL=p-atr, entryH=p-atr*.35, stop=p-atr*1.8, t1=p+atr*1.6, t2=p+atr*2.8, t3=p+atr*4.2;
+ let score=50+(ch>0?Math.min(25,ch*4):-Math.min(20,Math.abs(ch)*3));
+ if(n(q.value)>1e8) score+=10; else if(n(q.value)>3e7) score+=5;
+ score=Math.max(0,Math.min(100,Math.round(score)));
+ return {p,ch,entryL,entryH,stop,t1,t2,t3,score};
+}
+
+async function getJSON(url){
+ const r=await fetch(url,{cache:"no-store"});
+ if(!r.ok) throw new Error("HTTP "+r.status);
+ return await r.json();
+}
+
+async function quote(sym){
+ try{
+   const q=await getJSON(API+"/v1/quote/"+encodeURIComponent(sym));
+   if(q && (q.price!=null || q.last_price!=null || q.close!=null)) return q;
+ }catch(e){}
+ const q=await getJSON(DEMO_API+"/demo/quote/"+encodeURIComponent(sym));
+ return q;
+}
+
+function fill(q,sym){
+ let z=plan(q);
+ document.getElementById("ticker").textContent=sym;
+ document.getElementById("name").textContent=q.name||q.company||q.company_name||"EGX Listed Company";
+ document.getElementById("price").textContent=fmt(z.p);
+ document.getElementById("chg").textContent=(z.ch>=0?"+":"")+fmt(z.ch)+"%";
+ document.getElementById("chg").className=z.ch>=0?"green":"red";
+ document.getElementById("vol").textContent=fmt(q.volume);
+ document.getElementById("value").textContent=fmt(q.value||q.turnover);
+ document.getElementById("sector").textContent=q.sector||"—";
+ document.getElementById("entry").textContent=fmt(z.entryL)+" – "+fmt(z.entryH);
+ document.getElementById("stop").textContent=fmt(z.stop);
+ document.getElementById("t1").textContent=fmt(z.t1);
+ document.getElementById("t2").textContent=fmt(z.t2);
+ document.getElementById("t3").textContent=fmt(z.t3);
+ document.getElementById("score").textContent=z.score+"/100";
+ document.getElementById("scorebar").style.width=z.score+"%";
+ document.getElementById("trend").textContent=z.ch>1.5?"🟢 زخم صاعد":z.ch<-1.5?"🔴 ضغط بيعي":"🟡 محايد";
+ document.getElementById("decision").textContent=z.score>=75?"🟢 فرصة قوية مبدئيًا":z.score>=60?"🟡 متابعة وانتظار تأكيد":"🔴 لا تطارد السعر";
+ document.getElementById("updated").textContent="آخر تحديث: "+new Date().toLocaleTimeString("ar-EG");
+}
+
+async function analyze(){
+ let s=document.getElementById("symbol").value.trim().toUpperCase();
+ if(!s)return;
+ document.getElementById("name").textContent="جاري تحميل السعر...";
+ try{fill(await quote(s),s)}
+ catch(e){document.getElementById("name").textContent="تعذر جلب السعر. جرّب الكود مثل NIPH أو COMI."}
+}
+
+async function scanEGX(){
+ let box=document.getElementById("scanResult");
+ box.innerHTML='<div class="loader">جاري تحميل قائمة الأسهم والأسعار...</div>';
+ try{
+   let data=await getJSON(API+"/v1/quotes");
+   let arr=Array.isArray(data)?data:(data.quotes||data.data||[]);
+   arr=arr.map(q=>{let s=q.symbol||q.reuters_code||q.code;return {q,s,z:plan(q)}}).filter(x=>x.s&&x.z.p>0);
+   arr.sort((a,b)=>b.z.score-a.z.score);
+   let top=arr.slice(0,20);
+   box.innerHTML='<div class="listrow"><b>السهم</b><b>السعر</b><b>القوة</b><b>الدخول</b></div>'+
+   top.map(x=>`<div class="listrow"><b>${x.s}</b><span>${fmt(x.z.p)}</span><span>${x.z.score}/100</span><span>${fmt(x.z.entryL)}–${fmt(x.z.entryH)}</span></div>`).join("");
+ }catch(e){box.innerHTML='<div class="loader">تعذر تشغيل الفحص الآن.</div>'}
+}
+
+function tab(x){
+ document.getElementById("analysis").style.display=x==="analysis"?"block":"none";
+ document.getElementById("scan").style.display=x==="scan"?"block":"none";
+ document.getElementById("tabA").classList.toggle("active",x==="analysis");
+ document.getElementById("tabS").classList.toggle("active",x==="scan");
+}
+analyze();
+</script>
+</body>
+</html>
